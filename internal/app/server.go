@@ -26,17 +26,20 @@ func NewServer() *Server {
 		router:    router,
 	}
 
-	router.HandleFunc("/", server.IndexHandler)
-	router.HandleFunc("/mesh/config", server.MeshNodeConfigHandler)
-
 	return server
 }
 
-//IndexHandler handles the index
-func (server *Server) IndexHandler(response http.ResponseWriter, request *http.Request) {
-	fmt.Fprint(response, "Hello world!")
+func (server *Server) makeRoutes() {
+	router := server.router
+
+	router.HandleFunc("/mesh/abuse-report", server.getAbuseReports).Methods("GET")
+	router.HandleFunc("/mesh/abuse-report", server.addAbuseReport).Methods("POST")
 }
 
-func (server *Server) MeshNodeConfigHandler(response http.ResponseWriter, request *http.Request) {
-	fmt.Fprint(response, "Mesh config!")
+func (server *Server) getAbuseReports(response http.ResponseWriter, request *http.Request) {
+	
+}
+
+func (server *Server) addAbuseReport(response http.ResponseWriter, request *http.Request) {
+	
 }

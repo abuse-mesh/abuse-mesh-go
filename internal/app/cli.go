@@ -76,25 +76,25 @@ func (app *AbuseMeshApp) loadConfig(context *cli.Context) error {
 func (app *AbuseMeshApp) getSettingInt(context *cli.Context, name string, defaultValue int) int {
 	if context.IsSet(name) {
 		return context.Int(name)
-	} else {
-		if setting, err := app.config.Int(name); err == nil {
-			return setting
-		} else {
-			return defaultValue
-		}
 	}
+
+	if setting, err := app.config.Int(name); err == nil {
+		return setting
+	}
+
+	return defaultValue
 }
 
 func (app *AbuseMeshApp) getSettingString(context *cli.Context, name string, defaultValue string) string {
 	if context.IsSet(name) {
 		return context.String(name)
-	} else {
-		if setting, err := app.config.String(name); err == nil {
-			return setting
-		} else {
-			return defaultValue
-		}
 	}
+
+	if setting, err := app.config.String(name); err == nil {
+		return setting
+	}
+
+	return defaultValue
 }
 
 func (app *AbuseMeshApp) runServer(context *cli.Context) error {
