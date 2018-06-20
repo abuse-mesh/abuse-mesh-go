@@ -11,7 +11,10 @@
             "mode": "debug",
             "program": "${workspaceRoot}",
             "args": [
-                "start-server"
+                "start-server",
+                "--port",
+                "8080",
+                "--debug",
             ],
         },
         {
