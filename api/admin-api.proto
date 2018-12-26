@@ -1,0 +1,13 @@
+//This file contains the protocol definitions for the API which can be used to manage the AbuseMesh daemon
+syntax = "proto3";
+
+package admininterface;
+
+import "vendor/github.com/abuse-mesh/abuse-mesh-protocol/abuse-mesh-common.proto";
+
+message GetNodeRequest {}
+
+service admininterface {
+    //Returns the Node data of the current node
+    rpc GetNode (GetNodeRequest) returns (abusemesh.Node);
+}
