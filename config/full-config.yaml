@@ -1,0 +1,63 @@
+node:
+  # The identifier for this node
+  uuid: "038c8745-360c-4391-bdb2-bd2c09b63843"
+  
+  # The IP address on which the AbuseMesh daemon will listen for AbuseMesh protocol connections (default: 0.0.0.0)
+  listen-ip: "0.0.0.0"
+  
+  # The TCP port on which the AbuseMesh daemon will listen for AbuseMesh protocol connections (defalut: 180)
+  listen-port: 180
+
+  # If set to true no encryption will be used
+  # NOTE: this is mainly for development, other nodes should not accept insecure connections
+  insecure: true
+  
+  # The tls cert which will be used for the secure connection
+  tls-cert-file: "config/tls-cert.pem"
+  
+  # The tls key which will be used for the secure connection
+  tls-key-file: "config/tls-key.pem"
+  
+  # The Autonomous System Number for which this node claims to handle abuse
+  asn: 12345
+  
+  # The contact details of the organization which hosts this AbuseMesh node
+  # Every part of this config option is optional, however it is encouraged to at least specify basic details
+  contact-details:
+    # The name of the organization
+    organization-name: "Abuse Mesh"
+  
+    # The abuse/contact email address of the organization 
+    email-address: "abuse@abuse-mesh.net"
+  
+    # The abuse/contact phone number of the organization
+    phone-number: "12345678901"
+  
+    # The physical address of the organization
+    physical-address: "10 examplestreet, middle, of nowhere"
+  
+    # Contact details of responsible indeviduals
+    contact-persons:
+      - first-name: "John"
+        middle-name: "unknown"
+        last-name: "Doe"
+        job-title: "Abuse resolver"
+        email-address: "j.u.doe@abuse-mesh.net"
+        phone-number: "01234567890"
+
+  # The provider used for accessing pgp keys, options: file
+  pgp-provider: "file"
+  pgp-providers:
+    file:
+      key-ring-file: "config/pgp-keyring.pgp"
+      key-id: "862ACBB76C552E73"
+      ask-passphrase: true
+      passphrase: "PleaseN0ntUs3thisP4ssphrase!!!"  
+
+
+# The config for the admin interface which is used to manage the daemon remotely
+admin-interface:
+  # The IP address on which the AbuseMesh admin interface API will listen (default: 127.0.0.1)
+  listen-ip: "127.0.0.1"
+  # The port on which the AbuseMesh admin interface will listen (default: 181)
+  listen-port: 181

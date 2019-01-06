@@ -2,58 +2,65 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
-	"net"
-
-	"github.com/abuse-mesh/abuse-mesh-go-stubs/abusemesh"
+	"github.com/abuse-mesh/abuse-mesh-go/internal/config"
 	"github.com/abuse-mesh/abuse-mesh-go/pkg/server"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/testdata"
-)
-
-const (
-	abuseMeshPort = 180
-)
-
-var (
-	tls       = flag.Bool("tls", false, "Connection uses TLS if true, else plain TCP")
-	certFile  = flag.String("cert_file", "", "The TLS cert file")
-	keyFile   = flag.String("key_file", "", "The TLS key file")
-	ipAddress = flag.String("ip_address", "", "The IP address on which the daemon will listen")
+	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 func main() {
-	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ipAddress, abuseMeshPort))
+
+	var opts struct {
+		ConfigFile string `short:"f" long:"config-file" description:"specify a config file"`
+		ConfigType string `short:"t" long:"config-type" description:"specify a config type (json, yaml, toml)" default:"yaml"`
+	}
+
+	//Parse the cli flags
+	_, err := flags.Parse(&opts)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		//Exit the program, flags.Parse will print the error
+		return
 	}
 
-	var ip net.IP
-	ip = net.ParseIP(*ipAddress)
-	if ip == nil {
-		log.Fatalf("Invalid IP address '%s'", *ipAddress)
+	//Create a new viper config instance
+	viper := viper.New()
+
+	//Point viper to the config file
+	viper.SetConfigFile(opts.ConfigFile)
+	viper.SetConfigType(opts.ConfigType)
+
+	//Make it so all ENV variables need to be prefixed with AM(AbuseMesh)
+	viper.SetEnvPrefix("AM")
+
+	//Overwrite config file with ENV variables
+	viper.AutomaticEnv()
+
+	//Get the abuse mesh config
+	config, err := config.GetConfig(viper)
+	if err != nil {
+		if validationErrs, ok := err.(validator.ValidationErrors); ok {
+			for _, valErr := range validationErrs {
+				log.WithFields(log.Fields{
+					"field":      valErr.Field(),
+					"tag":        valErr.Tag(),
+					"actual_tag": valErr.ActualTag(),
+					"kind":       valErr.Kind(),
+					"type":       valErr.Type(),
+					"param":      valErr.Param(),
+					"value":      valErr.Value(),
+				}).Error("Error while loading config, config validation")
+			}
+		} else {
+			log.WithError(err).Error("Error while loading config")
+		}
+
+		log.Fatal("Stopped due to invalid config")
 	}
 
-	var opts []grpc.ServerOption
-	if *tls {
-		if *certFile == "" {
-			*certFile = testdata.Path("server1.pem")
-		}
-		if *keyFile == "" {
-			*keyFile = testdata.Path("server1.key")
-		}
-		creds, err := credentials.NewServerTLSFromFile(*certFile, *keyFile)
-		if err != nil {
-			log.Fatalf("Failed to generate credentials %v", err)
-		}
-		opts = []grpc.ServerOption{grpc.Creds(creds)}
-	}
+	log.Info("Config has been loaded")
 
-	grpcServer := grpc.NewServer(opts...)
-	abusemesh.RegisterAbuseMeshServer(grpcServer, server.NewAbuseMeshServer(ip))
-	grpcServer.Serve(lis)
+	err = server.ServeNewAbuseMeshServer(config)
+	log.WithError(err).Error("AbuseMesh protocol server has stopped")
 }
