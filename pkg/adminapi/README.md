@@ -1,6 +1,6 @@
 # Admin api
 
-To generate the admin api stubs run the following command from the root directory `docker run --rm -v $(pwd):$(pwd) -w $(pwd) znly/protoc -I . api/admin-api.proto --go_out=plugins=grpc:.`
+To generate the admin api stubs run the following command from the root directory `docker run --rm -v $(pwd):$(pwd) -w $(pwd) znly/protoc -I . -I vendor pkg/adminapi/adminapi.proto --go_out=plugins=grpc:.`
 
 WARNING: make sure you have first initialized the project by running `govendor sync` since the admin api protobuf file has a dependency.
 

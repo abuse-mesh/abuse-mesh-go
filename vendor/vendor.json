@@ -3,15 +3,21 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "H39nWp+IaHleBjIL/cVIuP3BF20=",
+			"checksumSHA1": "207+52MEgLkY0TkB9t2RTEBVJDM=",
 			"path": "github.com/abuse-mesh/abuse-mesh-go-stubs/abusemesh",
-			"revision": "50a37cb0acc26d650413a78aeabcda40eab86273",
-			"revisionTime": "2019-01-06T14:18:58Z"
+			"revision": "5025be67a77d972eb9ea81139a529e8305c09d2d",
+			"revisionTime": "2019-01-13T16:08:22Z"
 		},
 		{
-			"checksumSHA1": "cAXxtY9wNOlXd7Jns0iu4/Hb0+U=",
+			"checksumSHA1": "NlKqxigoYlewFPnFi5uejOAaMkU=",
 			"path": "github.com/abuse-mesh/abuse-mesh-protocol",
-			"revision": "c24a13ead9a5cbc984098d3b554c5f7bd931956f"
+			"revision": "4c8b41663d13344492375e79bb1b34e4e1c64feb"
+		},
+		{
+			"checksumSHA1": "t4apAne3v+atMajubbAb+JkaoIU=",
+			"path": "github.com/alexeyco/simpletable",
+			"revision": "2eb48bcee7cfbe89549a5aed28d7f28fddedd400",
+			"revisionTime": "2019-02-22T16:50:44Z"
 		},
 		{
 			"checksumSHA1": "7NP1qUMF8Kx1y0zANxx0e+oq9Oo=",
@@ -104,6 +110,12 @@
 			"revisionTime": "2018-09-06T18:38:39Z"
 		},
 		{
+			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
+			"path": "github.com/inconshreveable/mousetrap",
+			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+			"revisionTime": "2014-10-17T20:07:13Z"
+		},
+		{
 			"checksumSHA1": "HxzHdSrw2oBjI+Cbbj0YNnC+Mpk=",
 			"path": "github.com/jessevdk/go-flags",
 			"revision": "c0795c8afcf41dd1d786bebce68636c199b3bb45",
@@ -126,6 +138,12 @@
 			"path": "github.com/magiconair/properties",
 			"revision": "7c38529aac7222391b7a2661365177a97e21b998",
 			"revisionTime": "2018-11-20T17:11:50Z"
+		},
+		{
+			"checksumSHA1": "7zLQC+jG19ndjH24FVh/+ZliHac=",
+			"path": "github.com/mitchellh/go-homedir",
+			"revision": "af06845cf3004701891bf4fdb884bfe4920b3727",
+			"revisionTime": "2019-01-27T04:21:35Z"
 		},
 		{
 			"checksumSHA1": "J+g0oZePWp2zSIISD2dZZKTxmgg=",
@@ -168,6 +186,24 @@
 			"path": "github.com/spf13/cast",
 			"revision": "8c9545af88b134710ab1cd196795e7f2388358d7",
 			"revisionTime": "2018-10-24T22:49:29Z"
+		},
+		{
+			"checksumSHA1": "8fDK53Czr6IWx6KyeYfCptNeCjE=",
+			"path": "github.com/spf13/cobra",
+			"revision": "67fc4837d267bc9bfd6e47f77783fcc3dffc68de",
+			"revisionTime": "2019-03-21T00:05:52Z"
+		},
+		{
+			"checksumSHA1": "VmWKAW0vadKffeV3aCZxG4tQNfM=",
+			"path": "github.com/spf13/cobra/cobra",
+			"revision": "67fc4837d267bc9bfd6e47f77783fcc3dffc68de",
+			"revisionTime": "2019-03-21T00:05:52Z"
+		},
+		{
+			"checksumSHA1": "PJgIXJYpWBau5TWFC77OgyxDXN0=",
+			"path": "github.com/spf13/cobra/cobra/cmd",
+			"revision": "67fc4837d267bc9bfd6e47f77783fcc3dffc68de",
+			"revisionTime": "2019-03-21T00:05:52Z"
 		},
 		{
 			"checksumSHA1": "kmcWtDErtMPA3+o7+B4MDC3z+T0=",

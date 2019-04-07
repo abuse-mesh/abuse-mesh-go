@@ -1,7 +1,9 @@
 package pgp
 
-import "golang.org/x/crypto/openpgp/packet"
+import (
+	"golang.org/x/crypto/openpgp"
+)
 
 type PGPProvider interface {
-	GetPublicKey() *packet.PublicKey
+	GetEntity() *openpgp.Entity
 }

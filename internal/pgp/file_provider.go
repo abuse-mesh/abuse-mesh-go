@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/openpgp"
-	"golang.org/x/crypto/openpgp/packet"
 )
 
 //FileGPGProvider provides pgp via files on the filesystem
@@ -20,8 +19,8 @@ type FilePGPProvider struct {
 	passphrase      []byte
 }
 
-func (provider *FilePGPProvider) GetPublicKey() *packet.PublicKey {
-	return provider.keyInUse.PublicKey
+func (provider *FilePGPProvider) GetEntity() *openpgp.Entity {
+	return provider.keyInUse.Entity
 }
 
 func (provider *FilePGPProvider) init() error {

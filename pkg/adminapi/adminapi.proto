@@ -1,0 +1,86 @@
+//This file contains the protocol definitions for the API which can be used to manage the AbuseMesh daemon
+syntax = "proto3";
+
+package adminapi;
+
+import "github.com/abuse-mesh/abuse-mesh-protocol/abuse-mesh-common.proto";
+
+/**
+ * Start of request messages
+**/
+
+message GetNodeRequest {}
+
+message GetClientsRequest {}
+
+message GetServersRequest {}
+
+/**
+ * Start of response messages
+**/
+
+message GetClientsResponse {
+    repeated Client client = 1;
+}
+
+message GetServersResponse {
+    repeated Client client = 1;
+}
+
+/**
+ * Start of generic messages
+**/
+
+message Client {
+    //The id of the client node
+    abusemesh.UUID node_id = 1;
+    //The id of this session
+    abusemesh.UUID session_id = 2;
+    //If true the server wants to connect with the client
+    //If false no session will be accepted
+    bool server_active = 3;
+    //The current state of the connection
+    ClientSessionState state = 4;
+    //The count of events sent to the client
+    uint64 event_count = 5;
+}
+
+//The state the server assigned to the session with a client
+enum ClientSessionState {
+    ClientSessionIdle = 0;
+    ClientSessionEstablished = 1;
+    ClientSessionInterrupted = 2;
+}
+
+message Server {
+    //The id of the server node
+    abusemesh.UUID node_id = 1;
+    //The id of this session
+    abusemesh.UUID session_id = 2;
+    //If true the we are trying to connect to the server
+    //If false no connection attempts will be made
+    bool client_active = 3;
+    //The current state of the connection
+    ServerSessionState state = 4;
+    //The count of events received by the server
+    uint64 event_count = 5;
+}
+
+//The state the server assigned to the session with a client
+enum ServerSessionState {
+    ServerSessionIdle = 0;
+    ServerSessionEstablished = 1;
+    ServerSessionConnecting = 2;
+    ServerSessionInterrupted = 3;
+}
+
+service admininterface {
+    //Returns the Node data of the current node
+    rpc GetNode (GetNodeRequest) returns (abusemesh.Node);
+
+    //Returns all clients of this node
+    rpc GetClients (GetClientsRequest) returns (GetClientsResponse);
+
+    //Returns all servers of this node
+    rpc GetServers (GetServersRequest) returns (GetServersResponse);
+}

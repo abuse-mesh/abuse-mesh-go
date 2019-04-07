@@ -1,4 +1,4 @@
-package server
+package adminapiserver
 
 import (
 	"bytes"
@@ -9,20 +9,22 @@ import (
 	"github.com/abuse-mesh/abuse-mesh-go/internal/config"
 	"github.com/abuse-mesh/abuse-mesh-go/internal/entities"
 	"github.com/abuse-mesh/abuse-mesh-go/internal/pgp"
+	"github.com/abuse-mesh/abuse-mesh-go/pkg/adminapi"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
-type abuseMeshServer struct {
+type abuseMeshAdminApi struct {
 	config      *config.AbuseMeshConfig
 	pgpProvider pgp.PGPProvider
 	eventStream entities.EventStream
 	tables      *entities.TableSet
 }
 
-func (server abuseMeshServer) GetNode(context.Context, *abusemesh.GetNodeRequest) (*abusemesh.Node, error) {
-	nodeConfig := server.config.Node
+// Returns the Node data of the current node
+func (api *abuseMeshAdminApi) GetNode(context.Context, *adminapi.GetNodeRequest) (*abusemesh.Node, error) {
+	nodeConfig := api.config.Node
 
 	//Find out what ip family we have
 	ip := net.ParseIP(nodeConfig.ListenIP)
@@ -58,7 +60,7 @@ func (server abuseMeshServer) GetNode(context.Context, *abusemesh.GetNodeRequest
 
 	var buf bytes.Buffer
 
-	err := server.pgpProvider.GetPublicKey().Serialize(&buf)
+	err := api.pgpProvider.GetEntity().Serialize(&buf)
 	if err != nil {
 		log.WithError(err).Error("Error while serializing public key")
 		return nil, errors.WithStack(err)
@@ -66,7 +68,7 @@ func (server abuseMeshServer) GetNode(context.Context, *abusemesh.GetNodeRequest
 
 	return &abusemesh.Node{
 		Uuid: &abusemesh.UUID{
-			Uuid: server.config.Node.UUID,
+			Uuid: api.config.Node.UUID,
 		},
 		ASN: nodeConfig.ASN,
 		IpAddress: &abusemesh.IPAddress{
@@ -81,84 +83,32 @@ func (server abuseMeshServer) GetNode(context.Context, *abusemesh.GetNodeRequest
 	}, nil
 }
 
-// With this call a client offers a signature of the identity to the server
-// This allows the server to increase its credibility
-func (abuseMeshServer) OfferSignature(context.Context, *abusemesh.OfferSignatureRequest) (*abusemesh.OfferSignatureResponse, error) {
+// Returns all clients of this node
+func (api *abuseMeshAdminApi) GetClients(context.Context, *adminapi.GetClientsRequest) (*adminapi.GetClientsResponse, error) {
 	panic("not implemented")
 }
 
-func (abuseMeshServer) NegotiateNeighborship(context.Context, *abusemesh.NegotiateNeighborshipRequest) (*abusemesh.NegotiateNeighborshipResponse, error) {
+// Returns all servers of this node
+func (api *abuseMeshAdminApi) GetServers(context.Context, *adminapi.GetServersRequest) (*adminapi.GetServersResponse, error) {
 	panic("not implemented")
-}
-
-//Observes a event stream and executes a closure on every update
-type eventStreamObserver struct {
-	//The closure to be called
-	eventUpdate func(entities.Event)
-}
-
-func (observer *eventStreamObserver) EventUpdate(event entities.Event) {
-	observer.eventUpdate(event)
-}
-
-// Opens a stream on which all table events of a node are published
-func (server abuseMeshServer) TableEventStream(req *abusemesh.TableEventStreamRequest, stream abusemesh.AbuseMesh_TableEventStreamServer) error {
-	ctx := stream.Context()
-
-	eventChan := make(chan entities.Event, 1000) //NOTE the buffer size was chosen arbitrarily and may need to be tweaked
-
-	//Create a observer
-	observer := eventStreamObserver{
-		//On every event update call this function
-		eventUpdate: func(event entities.Event) {
-			eventChan <- event
-		},
-	}
-
-	//Attack to the event stream
-	server.eventStream.Attach(&observer)
-	//Make sure we always detach
-	defer server.eventStream.Detach(&observer)
-
-	//Loop forever
-	for {
-		select {
-		//Get a update from the event stream
-		case event := <-eventChan:
-			//Check if we are dealing with a generic event
-			if genericEvent, ok := event.(*entities.GenericEvent); ok {
-				err := stream.Send(&genericEvent.TableEvent)
-				if err != nil {
-					log.WithError(err).Error("Error while sending table event")
-				}
-			} else {
-				log.Error("Unknown event type")
-			}
-
-		//Get a stop signal from the client
-		case <-ctx.Done():
-			log.Info("Table event stream with '' was closed by client")
-			return nil
-		}
-	}
 }
 
 //NewAbuseMeshServer creates a new instance of a AbuseMeshServer
-func NewAbuseMeshServer(
+func NewAbuseMeshAdminAPI(
 	config *config.AbuseMeshConfig,
 	pgpProvider pgp.PGPProvider,
 	tableSet *entities.TableSet,
 	eventStream entities.EventStream,
 ) *grpc.Server {
 
-	//Configure the AbuseMesh protocol GRPC server
+	//Configure the Admin API GRPC server
 	var grpcOpts []grpc.ServerOption
 
 	//Create a new GRPC server instance
 	grpcServer := grpc.NewServer(grpcOpts...)
 
-	//Create a new AbuseMesh protocol server instace
-	abuseMeshServerInstance := &abuseMeshServer{
+	//Create a new Admin API instance
+	adminAPI := &abuseMeshAdminApi{
 		config:      config,
 		pgpProvider: pgpProvider,
 		tables:      tableSet,
@@ -166,7 +116,7 @@ func NewAbuseMeshServer(
 	}
 
 	//Register the AbuseMeshServer at the GRPC server
-	abusemesh.RegisterAbuseMeshServer(grpcServer, abuseMeshServerInstance)
+	adminapi.RegisterAdmininterfaceServer(grpcServer, adminAPI)
 
 	return grpcServer
 }
